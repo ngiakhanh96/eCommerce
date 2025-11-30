@@ -68,8 +68,7 @@ A microservices-based eCommerce platform built with **.NET 10**, **Domain-Driven
 
 | Layer                | Technology                        | Version |
 | -------------------- | --------------------------------- | ------- |
-| **Framework**        | .NET                              | 10.0    |
-| **Web API**          | ASP.NET Core Minimal APIs         | 10.0    |
+| **Framework**        | .NET Core                         | 10.0    |
 | **ORM**              | Entity Framework Core (In-Memory) | 10.0    |
 | **Messaging**        | Apache Kafka (Confluent.Kafka)    | -       |
 | **Orchestration**    | .NET Aspire                       | 13.0.1  |
