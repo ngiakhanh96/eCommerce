@@ -36,7 +36,7 @@ A microservices-based eCommerce platform built with **.NET 10**, **Domain-Driven
         ▼                           ▼                           ▼
 ┌───────────────┐          ┌────────────────┐          ┌───────────────┐
 │  UserService  │          │    Kafka       │          │ OrderService  │
-│               │◄────────►│                │          │               │
+│               │◄────────►│                │◄────────►│               │
 ├───────────────┤          ├────────────────┤          ├───────────────┤
 │ • Create User │          │ Topics:        │          │ • Create Order│
 │ • Get User    │          │ • user-created │          │ • Get Order   │
@@ -44,12 +44,12 @@ A microservices-based eCommerce platform built with **.NET 10**, **Domain-Driven
 └───────┬───────┘          └────────────────┘          └───────┬───────┘
         │                                                      │
         ▼                                                      ▼
-┌───────────────┐                                    ┌───────────────┐
-│ UserDbContext │                                    │OrderDbContext │
-│ (In-Memory DB)│                                    │(In-Memory DB) │
-│ • Users       │                                    │ • Orders      │
-│ • RefOrders   │                                    │ • RefUsers    │
-└───────────────┘                                    └───────────────┘
+┌───────────────┐                                      ┌───────────────┐
+│ UserDbContext │                                      │ OrderDbContext│
+│ (In-Memory DB)│                                      │ (In-Memory DB)│
+│ • Users       │                                      │ • Orders      │
+│ • RefOrders   │                                      │ • RefUsers    │
+└───────────────┘                                      └───────────────┘
 ```
 
 ### Key Architectural Patterns
