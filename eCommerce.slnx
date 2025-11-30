@@ -1,0 +1,20 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="API.md" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="docker-compose.dcproj">
+    <Build />
+  </Project>
+  <Project Path="eCommerce.AppHost/eCommerce.AppHost.csproj" />
+  <Project Path="eCommerce.EventBus.Tests/eCommerce.EventBus.Tests.csproj" />
+  <Project Path="eCommerce.EventBus/eCommerce.EventBus.csproj" Id="0b5dc6ac-d1e5-4518-a42b-9e00e439e072" />
+  <Project Path="eCommerce.Mediator.Tests/eCommerce.Mediator.Tests.csproj" />
+  <Project Path="eCommerce.Mediator/eCommerce.Mediator.csproj" Id="a67f4338-0a75-4e90-aca2-d07db46fb104" />
+  <Project Path="eCommerce.OrderService.Tests/eCommerce.OrderService.Tests.csproj" />
+  <Project Path="eCommerce.OrderService/eCommerce.OrderService.csproj" />
+  <Project Path="eCommerce.ServiceDefaults.Tests/eCommerce.ServiceDefaults.Tests.csproj" />
+  <Project Path="eCommerce.ServiceDefaults/eCommerce.ServiceDefaults.csproj" />
+  <Project Path="eCommerce.UserService.Tests/eCommerce.UserService.Tests.csproj" />
+  <Project Path="eCommerce.UserService/eCommerce.UserService.csproj" />
+</Solution>

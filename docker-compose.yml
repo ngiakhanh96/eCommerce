@@ -1,0 +1,118 @@
+services:
+  env-dashboard:
+    image: 'mcr.microsoft.com/dotnet/nightly/aspire-dashboard:latest'
+    expose:
+      - '18888'
+      - '18889'
+    ports:
+      - '18888:18888'
+      - '18889:18889'
+    environment:
+      DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: 'true'
+    networks:
+      - 'aspire'
+    restart: 'always'
+
+  kafka:
+    image: 'docker.io/confluentinc/confluent-local:8.1.0'
+    environment:
+      KAFKA_LISTENERS: 'PLAINTEXT://localhost:29092,CONTROLLER://localhost:29093,PLAINTEXT_HOST://0.0.0.0:9092,PLAINTEXT_INTERNAL://0.0.0.0:9093'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:29092,PLAINTEXT_HOST://kafka:9092,PLAINTEXT_INTERNAL://kafka:9093'
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+    expose:
+      - '9092'
+      - '9093'
+    networks:
+      - 'aspire'
+
+  kafka-init:
+    image: 'docker.io/confluentinc/confluent-local:8.1.0'
+    depends_on:
+      - kafka
+    entrypoint: ['/bin/sh', '-c']
+    command: |
+      "
+      echo 'Waiting for Kafka to be ready...'
+
+      # Wait for Kafka to be ready (retry up to 30 times)
+      for i in $$(seq 1 30); do
+        kafka-broker-api-versions --bootstrap-server kafka:9092 > /dev/null 2>&1 && break
+        echo 'Waiting for Kafka... attempt' $$i
+        sleep 2
+      done
+
+      echo 'Kafka is ready! Creating topics...'
+
+      # Create topics for user and order services
+      kafka-topics --create --if-not-exists --bootstrap-server kafka:9092 --topic user-created --partitions 1 --replication-factor 1
+
+      kafka-topics --create --if-not-exists --bootstrap-server kafka:9092 --topic order-created --partitions 1 --replication-factor 1
+
+      echo 'Topics created successfully!'
+
+      # List all topics to verify
+      kafka-topics --list --bootstrap-server kafka:9092
+      "
+    networks:
+      - 'aspire'
+
+  userservice:
+    build:
+      context: .
+      dockerfile: eCommerce.UserService/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: 'Development'
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: 'true'
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: 'true'
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: 'in_memory'
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: 'true'
+      HTTP_PORTS: '8080'
+      Kafka:ConsumerGroup: 'user-service-consumer-group'
+      ConnectionStrings__kafka: 'kafka:9092'
+      KAFKA_HOST: 'kafka'
+      KAFKA_PORT: '9092'
+      OTEL_EXPORTER_OTLP_ENDPOINT: 'http://env-dashboard:18889'
+      OTEL_EXPORTER_OTLP_PROTOCOL: 'grpc'
+      OTEL_SERVICE_NAME: 'userservice'
+    ports:
+      - '55453:8080'
+    depends_on:
+      kafka:
+        condition: 'service_started'
+      kafka-init:
+        condition: 'service_completed_successfully'
+    networks:
+      - 'aspire'
+
+  orderservice:
+    build:
+      context: .
+      dockerfile: eCommerce.OrderService/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: 'Development'
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: 'true'
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: 'true'
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: 'in_memory'
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: 'true'
+      HTTP_PORTS: '8080'
+      Kafka:ConsumerGroup: 'order-service-consumer-group'
+      ConnectionStrings__kafka: 'kafka:9092'
+      KAFKA_HOST: 'kafka'
+      KAFKA_PORT: '9092'
+      OTEL_EXPORTER_OTLP_ENDPOINT: 'http://env-dashboard:18889'
+      OTEL_EXPORTER_OTLP_PROTOCOL: 'grpc'
+      OTEL_SERVICE_NAME: 'orderservice'
+    ports:
+      - '54987:8080'
+    depends_on:
+      kafka:
+        condition: 'service_started'
+      kafka-init:
+        condition: 'service_completed_successfully'
+    networks:
+      - 'aspire'
+
+networks:
+  aspire:
+    driver: 'bridge'
