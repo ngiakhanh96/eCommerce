@@ -77,7 +77,7 @@ public static class ResiliencePolicies
         var retryPolicy = CreateRetryPolicy(logger);
         var circuitBreakerPolicy = CreateCircuitBreakerPolicy(logger);
 
-        // Circuit breaker wraps retry - if retries keep failing, circuit opens
-        return Policy.WrapAsync(circuitBreakerPolicy, retryPolicy);
+        //Retry wraps Circuit breaker - if retries keep failing, circuit opens
+        return Policy.WrapAsync(retryPolicy, circuitBreakerPolicy);
     }
 }
