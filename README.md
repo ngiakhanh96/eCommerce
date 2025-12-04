@@ -18,7 +18,6 @@ A microservices-based eCommerce platform built with **.NET 10**, **Domain-Driven
 - [Resilience Patterns](#-resilience-patterns)
 - [Configuration Management](#️-configuration-management)
 - [Future Improvements](#-future-improvements)
-- [License](#-license)
 - [Author](#-author)
 
 ---
@@ -235,11 +234,13 @@ Follow this sequence to test the full event-driven flow:
 While MediatR is the industry standard for CQRS patterns, a custom implementation was chosen for this project:
 
 **Cost & Licensing Considerations:**
+
 - MediatR transitioned to dual licensing (free community + premium commercial)
 - Custom implementation eliminates dependency on external commercial packages
 - Reduces licensing complexity for enterprise adoption
 
 **Educational & Transparency:**
+
 - Demonstrates deep understanding of CQRS pattern mechanics
 - Shows ability to implement core architectural patterns from scratch
 - Provides complete visibility into command/query routing logic
@@ -249,22 +250,26 @@ While MediatR is the industry standard for CQRS patterns, a custom implementatio
 .NET Aspire is Microsoft's modern platform for building distributed cloud-native applications with .NET. For this project, it provides several critical advantages:
 
 **Development Experience:**
+
 - **Single Command Startup**: `dotnet run --project eCommerce.AppHost` starts all services, infrastructure, and orchestration
 - **Service Discovery**: Automatic DNS resolution between services (no manual configuration)
 - **Environment Consistency**: Development environment mirrors production setup
 
 **Built-in Observability:**
+
 - **OpenTelemetry Integration**: Distributed tracing, metrics, and logs automatically instrumented
 - **Aspire Dashboard**: Real-time visualization of services, traces, logs, and performance metrics
 - **Health Checks**: Automatic `/health` and `/alive` endpoints configured per service
 - **Structured Logging**: JSON-formatted logs for aggregation and analysis
 
 **Production Readiness:**
+
 - **Cloud-Native by Default**: Designed for containerized and Kubernetes deployments
 - **Resource Management**: Built-in patterns for resilience, retry policies, and circuit breakers
 - **Extensible**: Pluggable components for databases, caches, queues, and external services
 
 **Educational Value:**
+
 - Demonstrates understanding of modern .NET distributed systems patterns
 - Shows practical application of cloud-native principles
 - Aligns with industry best practices and Microsoft's direction
@@ -288,14 +293,14 @@ eCommerce.Tests/
 
 The project includes comprehensive unit tests covering all critical components to ensure code quality and reliability.
 
-| Layer                 | Test Type  | Coverage Focus                                                             |
-| --------------------- | ---------- | -------------------------------------------------------------------------- |
-| **Domain**            | Unit Tests | Aggregate roots, entity creation, immutability, factory methods            |
-| **Application**       | Unit Tests | Command/Query handlers, validation pipelines, DTOs mapping                 |
-| **Infrastructure**    | Unit Tests | Repository implementations, event handlers, integration events             |
-| **EventBus**          | Unit Tests | Event publishing, resilience policies (retry, circuit breaker), handlers   |
-| **Mediator**          | Unit Tests | Command/Query buses, validating decorators, validation exceptions          |
-| **ServiceDefaults**   | Unit Tests | Global exception handling middleware, request logging middleware           |
+| Layer               | Test Type  | Coverage Focus                                                           |
+| ------------------- | ---------- | ------------------------------------------------------------------------ |
+| **Domain**          | Unit Tests | Aggregate roots, entity creation, immutability, factory methods          |
+| **Application**     | Unit Tests | Command/Query handlers, validation pipelines, DTOs mapping               |
+| **Infrastructure**  | Unit Tests | Repository implementations, event handlers, integration events           |
+| **EventBus**        | Unit Tests | Event publishing, resilience policies (retry, circuit breaker), handlers |
+| **Mediator**        | Unit Tests | Command/Query buses, validating decorators, validation exceptions        |
+| **ServiceDefaults** | Unit Tests | Global exception handling middleware, request logging middleware         |
 
 ### Running Tests
 
@@ -449,12 +454,6 @@ The following enhancements would further strengthen the architecture for product
 | **Event Sourcing**        | Store all state changes as events            | Complete audit trail, temporal queries |
 | **CQRS Read Models**      | Separate optimized read databases            | Better query performance at scale      |
 | **Kubernetes Deployment** | Add Helm charts for K8s deployment           | Container orchestration for production |
-
----
-
-## 📝 License
-
-This project is created as part of an interview assignment.
 
 ---
 
