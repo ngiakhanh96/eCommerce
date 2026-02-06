@@ -79,7 +79,6 @@ public class KafkaEventSubscriber : IEventSubscriber
                 _logger.LogInformation($"Received message from topic '{message.Topic}': {message.Message.Value}");
                 var headerBytes = message.Message.Headers.GetLastBytes("traceparent");
                 var parentId = headerBytes != null ? Encoding.UTF8.GetString(headerBytes) : null;
-                // 4. Start the Activity manually
                 using var activity = ActivitySource.StartActivity(
                     "kafka.consume", 
                     ActivityKind.Consumer, 
