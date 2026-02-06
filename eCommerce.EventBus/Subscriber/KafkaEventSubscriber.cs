@@ -2,6 +2,8 @@ using Confluent.Kafka;
 using eCommerce.EventBus.EventHandler;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
+using System.Text;
 
 namespace eCommerce.EventBus.Subscriber;
 
@@ -11,12 +13,13 @@ namespace eCommerce.EventBus.Subscriber;
 /// </summary>
 public class KafkaEventSubscriber : IEventSubscriber
 {
+    public static readonly string ActivitySourceName = "KafkaConsumer";
+    private static readonly ActivitySource ActivitySource = new(ActivitySourceName);
     private readonly IConsumer<string, string> _consumer;
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<KafkaEventSubscriber> _logger;
     private Task? _consumerTask;
-    private readonly Dictionary<string, Type> _topicToEventHandlerMapping;  
-
+    private readonly Dictionary<string, Type> _topicToEventHandlerMapping;
     public KafkaEventSubscriber(
         Dictionary<string, Type> topicToEventHandlerMapping, 
         IServiceProvider serviceProvider)
@@ -73,12 +76,20 @@ public class KafkaEventSubscriber : IEventSubscriber
                 if (message == null)
                     continue;
 
-                _logger.LogInformation($"Received message from topic '{message.Topic}': {message.Value}");
+                _logger.LogInformation($"Received message from topic '{message.Topic}': {message.Message.Value}");
+                var headerBytes = message.Message.Headers.GetLastBytes("traceparent");
+                var parentId = headerBytes != null ? Encoding.UTF8.GetString(headerBytes) : null;
+                // 4. Start the Activity manually
+                using var activity = ActivitySource.StartActivity(
+                    "kafka.consume", 
+                    ActivityKind.Consumer, 
+                    parentId); // This links it to the Producer!
 
+                activity?.SetTag("messaging.kafka.topic", message.Topic);
                 try
                 {
                     // Route to appropriate handler based on topic
-                    await RouteMessageAsync(message.Topic, message.Value);
+                    await RouteMessageAsync(message.Topic, message.Message.Value);
                 }
                 catch (Exception ex)
                 {

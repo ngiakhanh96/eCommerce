@@ -24,7 +24,14 @@ public static class EventBusServiceExtensions
         builder.AddKafkaConsumer<string, string>(connectionName, settings =>
         {
             settings.Config.GroupId = groupId;
+            settings.DisableTracing = true;
         });
+
+        builder.Services.AddOpenTelemetry()
+            .WithTracing(tracing =>
+            {
+                tracing.AddSource(KafkaEventSubscriber.ActivitySourceName);
+            });
 
         // Register Kafka event handlers and event subscriber
         foreach (var (topic, eventHandlerType) in topicToEventHandlerMapping)
