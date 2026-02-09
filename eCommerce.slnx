@@ -3,17 +3,18 @@
     <File Path="API.md" />
     <File Path="README.md" />
   </Folder>
-  <Project Path="../eCommerce.Aop/eCommerce.Aop.csproj" Id="7a4128ae-9665-4045-8dc8-8bf548c433dc" />
-  <Project Path="../eCommerce.Cache/eCommerce.Cache.csproj" Id="e997c991-daa6-4ecd-b15b-c3e34f59df13" />
-  <Project Path="../eCommerce.Logging/eCommerce.Logging.csproj" Id="e68c6115-aab2-4199-bbaa-f7940028614f" />
+  
   <Project Path="docker-compose.dcproj">
-    <Build />
+	<Build />
   </Project>
   <Project Path="eCommerce.AppHost/eCommerce.AppHost.csproj" />
   <Project Path="eCommerce.EventBus.Tests/eCommerce.EventBus.Tests.csproj" />
   <Project Path="eCommerce.EventBus/eCommerce.EventBus.csproj" Id="0b5dc6ac-d1e5-4518-a42b-9e00e439e072" />
   <Project Path="eCommerce.Mediator.Tests/eCommerce.Mediator.Tests.csproj" />
   <Project Path="eCommerce.Mediator/eCommerce.Mediator.csproj" Id="a67f4338-0a75-4e90-aca2-d07db46fb104" />
+  <Project Path="eCommerce.Aop/eCommerce.Aop.csproj" Id="7a4128ae-9665-4045-8dc8-8bf548c433dc" />
+  <Project Path="eCommerce.Cache/eCommerce.Cache.csproj" Id="e997c991-daa6-4ecd-b15b-c3e34f59df13" />
+  <Project Path="eCommerce.Logging/eCommerce.Logging.csproj" Id="e68c6115-aab2-4199-bbaa-f7940028614f" />
   <Project Path="eCommerce.OrderService.Tests/eCommerce.OrderService.Tests.csproj" />
   <Project Path="eCommerce.OrderService/eCommerce.OrderService.csproj" />
   <Project Path="eCommerce.ServiceDefaults.Tests/eCommerce.ServiceDefaults.Tests.csproj" />
