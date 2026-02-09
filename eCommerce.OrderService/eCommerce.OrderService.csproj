@@ -10,9 +10,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\eCommerce.Cache\eCommerce.Cache.csproj" />
-    <ProjectReference Include="..\..\eCommerce.Logging\eCommerce.Logging.csproj" />
+    <ProjectReference Include="..\eCommerce.Cache\eCommerce.Cache.csproj" />
     <ProjectReference Include="..\eCommerce.EventBus\eCommerce.EventBus.csproj" />
+    <ProjectReference Include="..\eCommerce.Logging\eCommerce.Logging.csproj" />
     <ProjectReference Include="..\eCommerce.Mediator\eCommerce.Mediator.csproj" />
     <ProjectReference Include="..\eCommerce.ServiceDefaults\eCommerce.ServiceDefaults.csproj" />
   </ItemGroup>
