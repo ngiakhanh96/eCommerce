@@ -1,3 +1,5 @@
+using eCommerce.Aop;
+using eCommerce.Cache;
 using eCommerce.EventBus.Extensions;
 using eCommerce.Mediator.Commands;
 using eCommerce.Mediator.Extensions;
@@ -36,6 +38,9 @@ builder.Services.AddScoped<ICommandHandler<CreateOrderCommand, OrderDto>, Create
 // Register query handlers
 builder.Services.AddScoped<IQueryHandler<GetOrderQuery, OrderDto?>, GetOrderQueryHandler>();
 
+// Add Cache service
+builder.Services.AddInMemoryCacheProvider();
+
 // Add Kafka event publisher
 builder.AddKafkaEventPublisher("kafka");
 
@@ -49,7 +54,7 @@ builder.AddKafkaEventSubscribers(kafkaConsumerGroup, "kafka", new Dictionary<str
 });
 
 
-var app = builder.Build();
+var app = builder.WithProxyCache().BuildWithProxies();
 
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();

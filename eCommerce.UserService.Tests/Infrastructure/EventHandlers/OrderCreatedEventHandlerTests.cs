@@ -3,7 +3,6 @@ using eCommerce.UserService.Domain.References;
 using eCommerce.UserService.Infrastructure.EventHandlers;
 using eCommerce.UserService.Infrastructure.IntegrationEvents.Incoming;
 using Microsoft.Extensions.Logging;
-using Moq;
 
 namespace eCommerce.UserService.Tests.Infrastructure.EventHandlers;
 

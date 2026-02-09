@@ -3,6 +3,8 @@
     <File Path="API.md" />
     <File Path="README.md" />
   </Folder>
+  <Project Path="../eCommerce.Aop/eCommerce.Aop.csproj" Id="7a4128ae-9665-4045-8dc8-8bf548c433dc" />
+  <Project Path="../eCommerce.Cache/eCommerce.Cache.csproj" Id="e997c991-daa6-4ecd-b15b-c3e34f59df13" />
   <Project Path="docker-compose.dcproj">
     <Build />
   </Project>

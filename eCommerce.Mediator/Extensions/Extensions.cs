@@ -1,6 +1,5 @@
 using eCommerce.Mediator.Commands;
 using eCommerce.Mediator.Queries;
-using eCommerce.Mediator.Validation;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;

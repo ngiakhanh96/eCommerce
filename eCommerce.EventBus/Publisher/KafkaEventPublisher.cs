@@ -1,6 +1,5 @@
 using Confluent.Kafka;
 using eCommerce.EventBus.IntegrationEvents;
-using System.Diagnostics;
 using System.Text.Json;
 
 namespace eCommerce.EventBus.Publisher;

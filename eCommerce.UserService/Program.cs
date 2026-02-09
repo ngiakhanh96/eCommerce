@@ -1,3 +1,5 @@
+using eCommerce.Aop;
+using eCommerce.Cache;
 using eCommerce.EventBus.Extensions;
 using eCommerce.Mediator.Commands;
 using eCommerce.Mediator.Extensions;
@@ -10,8 +12,8 @@ using eCommerce.UserService.Application.Validators;
 using eCommerce.UserService.Domain.AggregatesModel.UserAggregate;
 using eCommerce.UserService.Domain.References;
 using eCommerce.UserService.Infrastructure;
-using eCommerce.UserService.Infrastructure.Repositories;
 using eCommerce.UserService.Infrastructure.EventHandlers;
+using eCommerce.UserService.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,6 +39,9 @@ builder.Services.AddScoped<ICommandHandler<CreateUserCommand, UserDto>, CreateUs
 builder.Services.AddScoped<IQueryHandler<GetUserQuery, UserDto?>, GetUserQueryHandler>();
 builder.Services.AddScoped<IQueryHandler<GetUserOrdersQuery, List<OrderDto>>, GetUserOrdersQueryHandler>();
 
+// Add Cache service
+builder.Services.AddInMemoryCacheProvider();
+
 // Add Kafka event publisher
 builder.AddKafkaEventPublisher("kafka");
 
@@ -49,7 +54,7 @@ builder.AddKafkaEventSubscribers(kafkaConsumerGroup, "kafka", new Dictionary<str
     {"order-created", typeof(OrderCreatedEventHandler)}
 });
 
-var app = builder.Build();
+var app = builder.WithProxyCache().BuildWithProxies();
 
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
