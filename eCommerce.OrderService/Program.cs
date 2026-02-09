@@ -15,11 +15,13 @@ using eCommerce.OrderService.Infrastructure.EventHandlers;
 using eCommerce.OrderService.Infrastructure.Repositories;
 using eCommerce.ServiceDefaults;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
+using eCommerce.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire client integrations.
-builder.AddServiceDefaults();
+builder.AddServiceDefaults(ApplicationConstants.AppName);
 
 // Add EF Core in-memory database
 builder.Services.AddDbContext<OrderDbContext>(options =>
@@ -54,7 +56,10 @@ builder.AddKafkaEventSubscribers(kafkaConsumerGroup, "kafka", new Dictionary<str
 });
 
 
-var app = builder.WithProxyCache().BuildWithProxies();
+var app = builder
+    .WithCacheProxy()
+    .WithLogProxy(ApplicationConstants.AppActivitySource)
+    .BuildWithProxies();
 
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
@@ -85,3 +90,9 @@ app.MapGet("/orders/{id}", async (Guid id, IQueryBus queryBus) =>
 app.MapDefaultEndpoints();
 
 app.Run();
+
+public static class ApplicationConstants
+{
+    public static string AppName = "eCommerce.OrderService";
+    public static ActivitySource AppActivitySource = new(AppName);
+}

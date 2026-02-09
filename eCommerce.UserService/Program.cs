@@ -1,6 +1,8 @@
+using System.Diagnostics;
 using eCommerce.Aop;
 using eCommerce.Cache;
 using eCommerce.EventBus.Extensions;
+using eCommerce.Logging;
 using eCommerce.Mediator.Commands;
 using eCommerce.Mediator.Extensions;
 using eCommerce.Mediator.Queries;
@@ -19,7 +21,7 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire client integrations.
-builder.AddServiceDefaults();
+builder.AddServiceDefaults(ApplicationConstants.AppName);
 
 // Add EF Core in-memory database
 builder.Services.AddDbContext<UserDbContext>(options =>
@@ -54,7 +56,10 @@ builder.AddKafkaEventSubscribers(kafkaConsumerGroup, "kafka", new Dictionary<str
     {"order-created", typeof(OrderCreatedEventHandler)}
 });
 
-var app = builder.WithProxyCache().BuildWithProxies();
+var app = builder
+    .WithCacheProxy()
+    .WithLogProxy(ApplicationConstants.AppActivitySource)
+    .BuildWithProxies();
 
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
@@ -95,3 +100,9 @@ app.MapGet("/users/{id}/orders", async (Guid id, IQueryBus queryBus) =>
 app.MapDefaultEndpoints();
 
 app.Run();
+
+public static class ApplicationConstants
+{
+    public static string AppName = "eCommerce.UserService";
+    public static ActivitySource AppActivitySource = new(AppName);
+}
