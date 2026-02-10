@@ -4,9 +4,12 @@ namespace eCommerce.Cache;
 
 public static class ServicesExtensions
 {
-    public static IServiceCollection AddInMemoryCacheProvider(this IServiceCollection serviceCollection)
+    extension(IServiceCollection serviceCollection)
     {
-        serviceCollection.AddSingleton<InMemoryCacheService>();
-        return serviceCollection;
+        public IServiceCollection AddInMemoryCacheProvider()
+        {
+            serviceCollection.AddSingleton<InMemoryCacheService>();
+            return serviceCollection;
+        }
     }
 }

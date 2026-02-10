@@ -7,12 +7,12 @@ using Microsoft.Extensions.Logging;
 namespace eCommerce.Logging;
 public class LogProxy : BaseDispatchProxy<LogAttribute>
 {
-    private ILogger _logger;
+    private ILogger<LogProxy> _logger;
     private ActivitySource _activitySource;
 
     protected override void InitServices(MethodInfo? targetMethod, object?[]? args)
     {
-        _logger = _serviceProvider.GetRequiredService<ILogger>();
+        _logger = _serviceProvider.GetRequiredService<ILogger<LogProxy>>();
         _activitySource = _serviceProvider.GetRequiredService<ActivitySource>();
     }
 

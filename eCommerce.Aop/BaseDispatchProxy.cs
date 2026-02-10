@@ -11,7 +11,7 @@ public abstract class BaseDispatchProxy<T> : DispatchProxy where T : Attribute
     protected object _proxied;
     protected IServiceProvider _serviceProvider;
     
-    protected readonly ConcurrentDictionary<Type, Func<BaseDispatchProxy<T>, MethodInfo, T, object[], object>> _compiledDelegates = new();
+    protected static readonly ConcurrentDictionary<Type, Func<BaseDispatchProxy<T>, MethodInfo, T, object[], object>> CompiledDelegates = new();
     protected readonly ConcurrentDictionary<MethodInfo, CacheMetadata> _metadataCache = new();
 
     protected readonly struct CacheMetadata
@@ -130,7 +130,7 @@ public abstract class BaseDispatchProxy<T> : DispatchProxy where T : Attribute
         Type resultType,
         object?[]? args)
     {
-        var compiledDelegate = _compiledDelegates.GetOrAdd(resultType, _ =>
+        var compiledDelegate = CompiledDelegates.GetOrAdd(resultType, _ =>
         {
             var methodInfo = typeof(BaseDispatchProxy<T>)
                 .GetMethod(nameof(InvokeAsyncWithResult), BindingFlags.NonPublic | BindingFlags.Instance)!

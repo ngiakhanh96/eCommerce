@@ -1,4 +1,5 @@
 using eCommerce.EventBus.Publisher;
+using eCommerce.Logging;
 using eCommerce.Mediator.Commands;
 using eCommerce.UserService.Application.Dtos;
 using eCommerce.UserService.Domain.AggregatesModel.UserAggregate;
@@ -20,6 +21,7 @@ public class CreateUserCommandHandler : ICommandHandler<CreateUserCommand, UserD
         _eventPublisher = eventPublisher;
     }
 
+    [Log]
     public async Task<UserDto> HandleAsync(CreateUserCommand command)
     {
         // Check if email already exists

@@ -11,7 +11,7 @@ public static class WebApplicationBuilderExtensions
     {
         public WebApplicationBuilder WithLogProxy(ActivitySource activitySource)
         {
-            webApplicationBuilder.Services.AddScoped<ActivitySource>(svp => activitySource);
+            webApplicationBuilder.Services.AddSingleton<ActivitySource>(svp => activitySource);
             return webApplicationBuilder.WithAttributeAndProxy(typeof(LogAttribute), typeof(LogProxy));
         }
     }

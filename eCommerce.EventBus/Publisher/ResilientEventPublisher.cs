@@ -35,28 +35,17 @@ public class ResilientEventPublisher : IEventPublisher
     /// <param name="integrationEvent">The event to publish.</param>
     public async Task PublishAsync(OutgoingIntegrationEvent integrationEvent)
     {
-        var eventType = integrationEvent.GetType().Name;
-        var topic = integrationEvent.TopicName;
-
-        _logger.LogDebug(
-            "Publishing event {EventType} to topic {Topic} with resilience policies",
-            eventType,
-            topic);
-
         try
         {
             await _resiliencePolicy.ExecuteAsync(async () =>
             {
                 await _innerPublisher.PublishAsync(integrationEvent);
             });
-
-            _logger.LogInformation(
-                "Successfully published event {EventType} to topic {Topic}",
-                eventType,
-                topic);
         }
         catch (Exception ex)
         {
+            var eventType = integrationEvent.GetType().Name;
+            var topic = integrationEvent.TopicName;
             _logger.LogError(
                 ex,
                 "Failed to publish event {EventType} to topic {Topic} after all retry attempts",
