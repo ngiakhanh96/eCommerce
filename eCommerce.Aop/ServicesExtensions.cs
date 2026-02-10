@@ -1,10 +1,15 @@
-﻿using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Concurrent;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace eCommerce.Aop;
 
 public static class ServicesExtensions
 {
+    // Cache delegates per proxy type to avoid repeated reflection
+    private static readonly ConcurrentDictionary<Type, (Action<object, object> SetProxied, Action<object, IServiceProvider> SetServiceProvider)> ProxyMethodCache = new();
+    
     extension(IServiceCollection services)
     {
         public IServiceCollection AddProxyFromAssemblies(Type attributeType, Type proxyType)
@@ -76,24 +81,55 @@ public static class ServicesExtensions
         }
 
         return services;
+    }
 
-        static object ProxyFactory(IServiceProvider serviceProvider, Type proxyType, Type interfaceType, Type implementationType)
+    private static object ProxyFactory(IServiceProvider serviceProvider, Type proxyType, Type interfaceType, Type implementationType)
+    {
+        var proxy = DispatchProxy.Create(interfaceType, proxyType);
+        var actual = serviceProvider.GetRequiredService(implementationType);
+
+        // Get or create cached delegates for this proxy type
+        var (setProxied, setServiceProvider) = 
+            ProxyMethodCache.GetOrAdd(proxyType, CreateProxyDelegates);
+
+        setProxied(proxy, actual);
+        setServiceProvider(proxy, serviceProvider);
+
+        return proxy;
+    }
+
+    private static (Action<object, object> SetProxied, Action<object, IServiceProvider> SetServiceProvider) CreateProxyDelegates(Type proxyType)
+    {
+        // Cache SetProxied delegate
+        var setProxiedMethod = proxyType.GetMethod(
+            nameof(BaseDispatchProxy<>.SetProxied),
+            BindingFlags.Instance | BindingFlags.Public);
+
+        var setProxiedDelegate = CreateSetProxiedDelegate(setProxiedMethod);
+
+        // Cache SetServiceProvider delegate
+        var setServiceProviderMethod = proxyType.GetMethod(
+            nameof(BaseDispatchProxy<>.SetServiceProvider),
+            BindingFlags.Instance | BindingFlags.Public);
+
+        var setServiceProviderDelegate = CreateSetServiceProviderDelegate(setServiceProviderMethod);
+
+        return (setProxiedDelegate, setServiceProviderDelegate);
+
+        static Action<object, object> CreateSetProxiedDelegate(MethodInfo method)
         {
-            var proxy = DispatchProxy.Create(interfaceType, proxyType);
-            var actual = serviceProvider
-                .GetRequiredService(implementationType);
+            var instanceParam = Expression.Parameter(typeof(object), "instance");
+            var argParam = Expression.Parameter(typeof(object), "arg");
+            var call = Expression.Call(Expression.Convert(instanceParam, method.DeclaringType!), method, argParam);
+            return Expression.Lambda<Action<object, object>>(call, instanceParam, argParam).Compile();
+        }
 
-            var setDecoratedMethod = proxyType.GetMethod(
-                nameof(BaseDispatchProxy<>.SetProxied), 
-                BindingFlags.Instance | BindingFlags.Public);
-            setDecoratedMethod?.Invoke(proxy, [actual]);
-
-            var setServiceProviderMethod = proxyType.GetMethod(
-                nameof(BaseDispatchProxy<>.SetServiceProvider), 
-                BindingFlags.Instance | BindingFlags.Public);
-            setServiceProviderMethod?.Invoke(proxy, [serviceProvider]);
-
-            return proxy;
+        static Action<object, IServiceProvider> CreateSetServiceProviderDelegate(MethodInfo method)
+        {
+            var instanceParam = Expression.Parameter(typeof(object), "instance");
+            var argParam = Expression.Parameter(typeof(IServiceProvider), "arg");
+            var call = Expression.Call(Expression.Convert(instanceParam, method.DeclaringType!), method, argParam);
+            return Expression.Lambda<Action<object, IServiceProvider>>(call, instanceParam, argParam).Compile();
         }
     }
 }
